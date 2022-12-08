@@ -1,6 +1,6 @@
 {
   "name": "@seneca/mixpanel-provider",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "main": "dist/mixpanel-provider.js",
   "type": "commonjs",
   "types": "dist/mixpanel-provider.d.ts",

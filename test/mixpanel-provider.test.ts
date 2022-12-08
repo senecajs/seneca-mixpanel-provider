@@ -78,20 +78,18 @@ async function makeSeneca() {
       // debug: true,
       file: [__dirname + '/local-env.js;?'],
       var: {
-        $MIXPANEL_KEY: String,
-        $MIXPANEL_NAME: String,
-        $MIXPANEL_CUSTID: String,
-        $MIXPANEL_ACCID: String,
+        MIXPANEL_PROJECTKEY: String,
+        $MIXPANEL_PROJECTSECRET: String,
+        $MIXPANEL_PROJECTTOKEN: String,
       }
     })
     .use('provider', {
       provider: {
         mixpanel: {
           keys: {
-            key: { value: '$MIXPANEL_KEY' },
-            name: { value: '$MIXPANEL_NAME' },
-            cust: { value: '$MIXPANEL_CUSTID' },
-            acc: { value: '$MIXPANEL_ACCID' },
+            key: { value: '$MIXPANEL_PROJECTKEY' },
+            secret: { value: '$MIXPANEL_PROJECTSECRET' },
+            token: { value: '$MIXPANEL_PROJECTTOKEN' },
           }
         }
       }
