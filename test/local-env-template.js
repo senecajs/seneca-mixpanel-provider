@@ -1,6 +1,6 @@
 module.exports = {
-  TANGOCARD_NAME: '<NAME>',
-  TANGOCARD_KEY: '<KEY>',
-  TANGOCARD_CUSTID: '<customerIdentifier>',
-  TANGOCARD_ACCID: '<accountIdentifier>',
+  MIXPANEL_NAME: '<NAME>',
+  MIXPANEL_KEY: '<KEY>',
+  MIXPANEL_CUSTID: '<customerIdentifier>',
+  MIXPANEL_ACCID: '<accountIdentifier>',
 }

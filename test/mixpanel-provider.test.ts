@@ -7,8 +7,8 @@ import * as Fs from 'fs'
 const Seneca = require('seneca')
 const SenecaMsgTest = require('seneca-msg-test')
 
-import TangocardProvider from '../src/tangocard-provider'
-import TangocardProviderDoc from '../src/TangocardProvider-doc'
+import MixpanelProvider from '../src/mixpanel-provider'
+import MixpanelProviderDoc from '../src/MixpanelProvider-doc'
 
 const BasicMessages = require('./basic.messages.js')
 
@@ -20,18 +20,18 @@ if (Fs.existsSync(__dirname + '/local-config.js')) {
 }
 
 
-describe('tangocard-provider', () => {
+describe('mixpanel-provider', () => {
 
   test('happy', async () => {
-    expect(TangocardProvider).toBeDefined()
-    expect(TangocardProviderDoc).toBeDefined()
+    expect(MixpanelProvider).toBeDefined()
+    expect(MixpanelProviderDoc).toBeDefined()
 
     const seneca = await makeSeneca()
 
-    expect(await seneca.post('sys:provider,provider:tangocard,get:info'))
+    expect(await seneca.post('sys:provider,provider:mixpanel,get:info'))
       .toMatchObject({
         ok: true,
-        name: 'tangocard',
+        name: 'mixpanel',
       })
   })
 
@@ -47,10 +47,10 @@ describe('tangocard-provider', () => {
     if (!Config) return;
     const seneca = await makeSeneca()
 
-    const list = await seneca.entity("provider/tangocard/board").list$()
+    const list = await seneca.entity("provider/mixpanel/board").list$()
     expect(list.length > 0).toBeTruthy()
 
-    const board0 = await seneca.entity("provider/tangocard/board")
+    const board0 = await seneca.entity("provider/mixpanel/board")
       .load$(Config.board0.id)
     expect(board0.name).toContain('Welcome Board')
 
@@ -59,7 +59,7 @@ describe('tangocard-provider', () => {
     expect(board0r.id).toEqual(board0.id)
     expect(board0r.desc).toEqual(board0.desc)
 
-    const board0u = await seneca.entity("provider/tangocard/board")
+    const board0u = await seneca.entity("provider/mixpanel/board")
       .load$(Config.board0.id)
     expect(board0u.name).toContain('Welcome Board')
     expect(board0u.desc).toEqual(board0r.desc)
@@ -78,25 +78,25 @@ async function makeSeneca() {
       // debug: true,
       file: [__dirname + '/local-env.js;?'],
       var: {
-        $TANGOCARD_KEY: String,
-        $TANGOCARD_NAME: String,
-        $TANGOCARD_CUSTID: String,
-        $TANGOCARD_ACCID: String,
+        $MIXPANEL_KEY: String,
+        $MIXPANEL_NAME: String,
+        $MIXPANEL_CUSTID: String,
+        $MIXPANEL_ACCID: String,
       }
     })
     .use('provider', {
       provider: {
-        tangocard: {
+        mixpanel: {
           keys: {
-            key: { value: '$TANGOCARD_KEY' },
-            name: { value: '$TANGOCARD_NAME' },
-            cust: { value: '$TANGOCARD_CUSTID' },
-            acc: { value: '$TANGOCARD_ACCID' },
+            key: { value: '$MIXPANEL_KEY' },
+            name: { value: '$MIXPANEL_NAME' },
+            cust: { value: '$MIXPANEL_CUSTID' },
+            acc: { value: '$MIXPANEL_ACCID' },
           }
         }
       }
     })
-    .use(TangocardProvider)
+    .use(MixpanelProvider)
 
   return seneca.ready()
 }
