@@ -14,7 +14,7 @@
   "author": "Richard Rodger - richardrodger.com",
   "repository": {
     "type": "git",
-    "url": "git://mixpanel.com/senecajs/seneca-mixpanel-provider.git"
+    "url": "git://github.com/senecajs/seneca-mixpanel-provider.git"
   },
   "scripts": {
     "test": "jest --coverage",
