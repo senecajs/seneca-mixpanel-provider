@@ -2,139 +2,176 @@
 
 > _Seneca Mixpanel-Provider_ is a plugin for [Seneca](http://senecajs.org)
 
+Provides access to the Mixpanel Engage API using the Seneca _provider_
+convention. Mixpanel Engage entities are represented as Seneca entities so that
+they can be accessed using the Seneca entity API and messages.
 
-Provides access to the Mixpanel API using the Seneca *provider*
-convention. Mixpanel API entities are represented as Seneca entities so
-that they can be accessed using the Seneca entity API and messages.
+Requests are handled by the [Mixpanel Engage SDK](https://github.com/voxgig-sdk/mixpanel-sdk),
+which is generated from the API's OpenAPI specification. This plugin is
+generated from the same specification by
+[@voxgig/sdkgen](https://github.com/voxgig/sdkgen) — do not edit it by hand,
+change the model and regenerate.
 
-See [seneca-entity](senecajs/seneca-entity) and the [Seneca Data
+See [seneca-entity](https://github.com/senecajs/seneca-entity) and the [Seneca Data
 Entities
-Tutorial](https://senecajs.org/docs/tutorials/understanding-data-entities.html) for more details on the Seneca entity API.
+Tutorial](https://senecajs.org/docs/tutorials/understanding-data-entities.html)
+for more details on the Seneca entity API.
 
-NOTE: underlying third party SDK needs to be replaced as out of date and has a security issue.
-
-[![npm version](https://img.shields.io/npm/v/@seneca/mixpanel-provider.svg)](https://npmjs.com/package/@seneca/mixpanel-provider)
 [![build](https://github.com/senecajs/seneca-mixpanel-provider/actions/workflows/build.yml/badge.svg)](https://github.com/senecajs/seneca-mixpanel-provider/actions/workflows/build.yml)
-[![Coverage Status](https://coveralls.io/repos/github/senecajs/seneca-mixpanel-provider/badge.svg?branch=main)](https://coveralls.io/github/senecajs/seneca-mixpanel-provider?branch=main)
-[![Known Vulnerabilities](https://snyk.io/test/github/senecajs/seneca-mixpanel-provider/badge.svg)](https://snyk.io/test/github/senecajs/seneca-mixpanel-provider)
-[![DeepScan grade](https://deepscan.io/api/teams/5016/projects/19462/branches/505954/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=5016&pid=19462&bid=505954)
-[![Maintainability](https://api.codeclimate.com/v1/badges/f76e83896b731bb5d609/maintainability)](https://codeclimate.com/github/senecajs/seneca-mixpanel-provider/maintainability)
+
+| This open source module is sponsored and supported by [Voxgig](https://voxgig.com). |
+| --- |
 
 
-| ![Voxgig](https://www.voxgig.com/res/img/vgt01r.png) | This open source module is sponsored and supported by [Voxgig](https://www.voxgig.com). |
-|---|---|
+<!--START:SECTION:intro-->
+<!--END:SECTION:intro-->
+
+
+## Documentation
+
+Full documentation lives in [`doc/`](doc/README.md) and follows the
+[Diátaxis](https://diataxis.fr) framework:
+
+| Document | Purpose |
+| -------- | ------- |
+| [Tutorial](doc/tutorial.md) | Start here. Build a working script from an empty folder. |
+| [How-to guides](doc/how-to.md) | Recipes for specific tasks. |
+| [Reference](doc/reference.md) | Every pattern, entity, option and export. |
+| [Explanation](doc/explanation.md) | Why the plugin is designed this way. |
 
 
 ## Quick Example
 
-
 ```js
+const Seneca = require('seneca')
 
-// Setup - get the key value (<SECRET>) separately from a vault or
-// environment variable.
-Seneca()
-  // Get API keys using the seneca-env plugin
-  .use('env', {
-    var: {
-      $MIXPANEL_APIKEY: String,
-      $MIXPANEL_USERTOKEN: String,
-    }
-  })
+const seneca = Seneca()
+  .use('promisify')
+  .use('entity')
+  .use('env', { var: { $MIXPANEL_APIKEY: '' } })
   .use('provider', {
     provider: {
       mixpanel: {
-        keys: {
-          apikey: { value: '$MIXPANEL_APIKEY' },
-          usertoken: { value: '$MIXPANEL_USERTOKEN' },
-        }
-      }
-    }
+        keys: { apikey: { value: '$MIXPANEL_APIKEY' } },
+      },
+    },
   })
-  .use('mixpanel-provider')
+  .use('@seneca/mixpanel-provider')
 
-let board = await seneca.entity('provider/mixpanel/board')
-  .load$('<mixpanel-board-id>')
-
-Console.log('BOARD', board)
-
-board.desc = 'New description'
-board = await board.save$()
-
-Console.log('UPDATED BOARD', board)
+await seneca.ready()
 
 ```
+
 
 ## Install
 
 ```sh
-$ npm install @seneca/mixpanel-provider @seneca/env
+npm install @seneca/mixpanel-provider
 ```
 
+This plugin expects the Seneca host framework to be present:
 
-
-<!--START:options-->
+```sh
+npm install seneca seneca-entity seneca-promisify @seneca/provider @seneca/env
+```
 
 
 ## Options
 
-* `debug` : boolean <i><small>false</small></i>
+| Option | Type | Description |
+| --- | --- | --- |
+| `sdk` | object | Passed straight to the `MixpanelSDK` constructor. Most usefully `base`, to point at a server. |
+| `test` | boolean | Run the SDK in offline test mode (in-memory mock transport). |
+| `testopts` | object | Seed and options for the mock, used only when `test` is true. |
 
 
-Set plugin options when loading with:
-```js
+## Entities
 
+Each API entity is exposed as a Seneca entity under
+`provider/mixpanel/<entity>`.
 
-seneca.use('MixpanelProvider', { name: value, ... })
-
-
-```
-
-
-<small>Note: <code>foo.bar</code> in the list above means 
-<code>{ foo: { bar: ... } }</code></small> 
-
-
-
-<!--END:options-->
-
-<!--START:action-list-->
+| Seneca entity | Commands | Fields |
+| --- | --- | --- |
+| `provider/mixpanel/engage` | `save$` | `set`, `token` |
 
 
 ## Action Patterns
 
-* [role:entity,base:mixpanel,cmd:load,name:repo,zone:provider](#-roleentitybasemixpanelcmdloadnamerepozoneprovider-)
-* [role:entity,base:mixpanel,cmd:save,name:repo,zone:provider](#-roleentitybasemixpanelcmdsavenamerepozoneprovider-)
-* [sys:provider,get:info,provider:mixpanel](#-sysprovidergetinfoprovidermixpanel-)
+Every message pattern this plugin registers. The entity actions are the ones
+`seneca-entity` dispatches to when you call `list$` / `load$` / `save$` /
+`remove$` on a canon below — you rarely post them by hand, but they are what
+appears in a Seneca log, and a plugin that documents one of nine is a plugin
+whose logs cannot be read.
 
-
-<!--END:action-list-->
-
-<!--START:action-desc-->
-
-
-## Action Descriptions
-
-### &laquo; `role:entity,base:mixpanel,cmd:load,name:repo,zone:provider` &raquo;
-
-Load Mixpanel repository data into an entity.
+| Pattern | Description |
+| --- | --- |
+| `sys:provider,provider:mixpanel,get:info` | Plugin and SDK version information. |
+| `sys:entity,cmd:save,zone:provider,base:mixpanel,name:engage` | Create or update a record. |
 
 
 
-----------
-### &laquo; `role:entity,base:mixpanel,cmd:save,name:repo,zone:provider` &raquo;
+## More Examples
 
-Update Mixpanel repository data from an entity.
+### Offline testing
 
+The SDK ships an in-memory mock transport, so this plugin can be exercised
+with no server:
 
+```js
+.use('@seneca/mixpanel-provider', { test: true, testopts: { entity: { ... } } })
+```
 
-----------
-### &laquo; `sys:provider,get:info,provider:mixpanel` &raquo;
-
-Get information about the provider.
-
-
-
-----------
+`testopts` is passed straight to the SDK's test constructor; `entity`
+seeds the mock store. See `test/seed.js` for the shape.
 
 
-<!--END:action-desc-->
+## Motivation
+
+Applications rarely talk to one external service, and each service usually
+arrives with its own client library, authentication style and error
+conventions. That variety leaks into application code and makes it harder to
+test.
+
+The Seneca provider convention removes the variety: every external service
+becomes a Seneca entity reached with `list$`, `load$`, `save$` and
+`remove$`, so application code has one shape regardless of what it talks to.
+
+The SDK underneath arrives at a similar conclusion from the other side — it
+deliberately exposes entities rather than HTTP routes. This plugin is the
+short bridge between the two.
+
+
+## Support
+
+- Issues and bugs: [GitHub issues](https://github.com/senecajs/seneca-mixpanel-provider/issues)
+- Seneca community: [senecajs.org](http://senecajs.org)
+
+
+## API
+
+### Plugin export: `MixpanelProvider/sdk`
+
+Returns the configured `MixpanelSDK` instance, for the operations
+the entity API does not cover:
+
+```js
+const sdk = seneca.export('MixpanelProvider/sdk')()
+```
+
+
+## Contributing
+
+This plugin is GENERATED. Changes belong in the SDK project's model and
+components, not here — anything edited in this repository is overwritten by
+the next generation run.
+
+The [Senecajs org](http://senecajs.org) encourages open participation. If you
+feel you can help in any way, be it with bug reporting, documentation,
+examples, extra testing, or new features, please get in touch.
+
+
+## Background
+
+Generated by [@voxgig/sdkgen](https://github.com/voxgig/sdkgen) from the
+Mixpanel Engage API definition, against the
+[@voxgig-sdk/mixpanel](https://www.npmjs.com/package/@voxgig-sdk/mixpanel) SDK.

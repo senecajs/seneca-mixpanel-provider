@@ -1,5 +1,7 @@
 type MixpanelProviderOptions = {
-    conf: Record<string, any>;
+    sdk?: Record<string, any>;
+    test?: boolean;
+    testopts?: Record<string, any>;
 };
 declare function MixpanelProvider(this: any, options: MixpanelProviderOptions): {
     exports: {
